@@ -83,6 +83,12 @@ y luego mostrarla en un RV.
 
     DAR A SYNC NOW
 
+2)  DESAROLLO BÁSICO DE VISTAS
+    i)  layout
+        a) mars_item.xml
+
+        b)
+
 2) Definir interfaz de la API con retrofit, usando GET para obtener parametro
 
 3) Crear modelo para representar datos
