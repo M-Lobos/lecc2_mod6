@@ -2,6 +2,25 @@
 
 La librería Retrofit permite interactuar con la API, objener información específica
 y luego mostrarla en un RV.
+----------------------------------------------------------------------------------------------------
+PLAN DE ACCIÓN --> DESARROLLO DESDE EL MODELO HACIA LA INTERFAZ
+
+Configurar dependencias en gradles (project y module)
+Configurar permiso de red en manifest
+Modelos: Crea las data classes.
+
+    1.  Remote: Implementa Retrofit para traer datos de Marte.
+
+    2.  Local: Implementa Room para guardar esos datos.
+
+    3.  Repository: Une ambos mundos.
+
+ViewModel: Expone los datos del repositorio mediante LiveData o StateFlow.
+
+View: Configura el Adapter y el Fragment para observar al ViewModel y pintar los datos.
+
+----------------------------------------------------------------------------------------------------
+FLUJO
 
 1)  CONFIGURAR DEPENDENCIAS de Retrofit, GSON y RV en build.gradle
 
@@ -40,10 +59,11 @@ y luego mostrarla en un RV.
                 --> implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
                 --> implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 
-            b3) Coroutines; es una biblioteca esencial que permite gestionar la programación asíncrona de forma
-                eficiente, sencilla y legible
+                          b3) Coroutines; es una biblioteca esencial que permite gestionar la programación asíncrona de forma
+                        eficiente, sencilla y legible
 
                 --> implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
 
             b4) Retrofit; biblioteca cliente HTTP con seguridad de tipos para Kotlin y Android que simplifica
                 el consumo de APIs RESTful.
@@ -71,6 +91,10 @@ y luego mostrarla en un RV.
 
                 --> implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 
+                Corrección: Actualmente, ya no es necesario usar retrofit2-kotlin-coroutines-adapter
+                Razón: Desde la versión 2.6.0 de Retrofit, el soporte para suspend functions es nativo.
+                Usando la versión 2.11.0, se puede borrar esa dependenci
+
             b7) Glide
                 Librería de carga y visualización de imágenes para Android, diseñada para optimizar el
                 rendimiento y la fluidez en la interfaz de usuario. Automatiza tareas complejas como la
@@ -81,13 +105,68 @@ y luego mostrarla en un RV.
                 --> implementation ("com.github.bumptech.glide:glide:4.16.0")
                 --> annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
 
-    DAR A SYNC NOW
+                Corrección: Como estás usando KSP para Room, te recomiendo usar ksp también
+                para Glide en lugar de annotationProcessor.
+
+                ksp("github.bumptech.glide:ksp:4.16.0")
+
+    -> DAR A SYNC NOW para que gradle se reconstruya con las nuevas dep
 
 2)  DESAROLLO BÁSICO DE VISTAS
     i)  layout
-        a) mars_item.xml
+        a)  mars_item.xml       ->  Diseño del ítem: Es el molde (inflado por el Adapter)
+                                    que define cómo se ve una única celda en la lista.
 
-        b)
+        b)  fragment_first.xml  ->  Contenedor de lista: Aquí es donde debes colocar el
+                                    RecyclerView. Es la "pantalla" que muestra la colección
+                                    de parcelas.
+
+        c)  content_main.xml    ->  Puente de contenido: Es un archivo intermedio que utiliza
+                                    la plantilla Basic Activity. Su función es separar el
+                                    contenido de la actividad (como el FragmentContainerView)
+                                    de los elementos de UI persistentes (como el FAB o el Toolbar).
+
+                                ->  Host del NavHostFragment,es el espacio dedicado exclusivamente
+                                    a mostrar los fragmentos dentro del área segura de la actividad
+                                    (debajo de la Toolbar).
+
+        c)  activity_main.xml   ->  Marco estructural: Contiene el AppBar, el Toolbar y el botón
+                                    flotante (FAB). Incluye (include) a content_main.xml.
+
+3) DESARROLLO DE MODELO
+    i) MODEL
+        A)  REMOTE; Antes de pedir datos, hay que saber qué forma tienen
+
+            A1) Definir modelo de datos remote.
+                -> Crear MarsRealState (data class); Sin este contexto ni Retrofir, ni Room sabrán qué se está guardando
+
+            A2) Configurar Retrofit (acceso y conexión a la api)
+                ->  Crear MarsApi (interfaz) ; Con el @GET, esta interfaz es escencial para la comunicación
+                    con el servidor. Uso de corrutines (suspend) para evitar el bloqueo de la UI cuando se
+                    descargan fatos
+
+                ->  Crear RetrofitClient (class) ; patron SINGLETON con la BASE_URL, centraliza la configuración
+                    de red.
+
+
+        B) LOCALE
+        3. Configurar la Persistencia Local (Room)
+        Que se sabe qué datos llegan, preparar el almacenamiento.
+
+        Tarea: Crear MarsDao (las consultas SQL) y MarsDatabase.
+
+        Nota: Es probable que tu entidad de Room sea casi igual a MarsRealState.
+
+
+        B)  repo (Room)
+        4. Implementar el Repositorio (MarsRepository)
+        Este es el archivo que tienes seleccionado en la captura y es el cerebro logístico de tu app.
+
+        Función: El repositorio debe decidir: "¿Tengo datos en la DB local? Si no, los pido a la API, los guardo en la DB y luego se los paso al ViewModel".
+
+        Patrón Offline-First: Esto garantiza que tu app funcione aunque el usuario no tenga internet en ese momento.
+
+
 
 2) Definir interfaz de la API con retrofit, usando GET para obtener parametro
 
