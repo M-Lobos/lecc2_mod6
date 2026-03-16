@@ -149,16 +149,31 @@ FLUJO
                     de red.
 
 
-        B) LOCALE
-        3. Configurar la Persistencia Local (Room)
-        Que se sabe qué datos llegan, preparar el almacenamiento.
+        B) LOCALE: Configurar la Persistencia Local (Room), preparar almacenamiento para datos entrantes
 
-        Tarea: Crear MarsDao (las consultas SQL) y MarsDatabase.
+           B1) Crear MarsDao (interface)
+                ->  Provee los métodos (CRUD) que utilizará la app para interactuar con la base de datos
+                    SQLite mediante Rooms
+
+           B2) Crear MarsDataBase (class)}
+                ->  Es la classe principal de Room para la DB, es el punto de acceso para la conexión con esta  }
+                ->  Uso de Patrón Singleton
+                        El patrón Singleton es un patrón de diseño creacional que garantiza que una clase tenga
+                        una única instancia en toda la ejecución del programa y proporciona un punto de acceso
+                        global a ella. Se utiliza para controlar recursos compartidos como conexiones a bases de
+                        datos o archivos de configuración.
+
 
         Nota: Es probable que tu entidad de Room sea casi igual a MarsRealState.
 
+        C)  Respositorio (Room)
 
-        B)  repo (Room)
+
+        Tu MarsRepository es el corazón de la lógica de negocio de la aplicación. Has implementado
+        con éxito la sincronización de datos: los descargas de internet, los guardas en la base de
+        datos local y expones esos datos para que el resto de la app los use.
+
+
         4. Implementar el Repositorio (MarsRepository)
         Este es el archivo que tienes seleccionado en la captura y es el cerebro logístico de tu app.
 
