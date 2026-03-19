@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".View.FirstFragment">
+    tools:context=".view.FirstFragment"
+    android:background="@color/black">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTerrains"
         android:layout_width="317dp"
@@ -13,6 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.207" />
+        app:layout_constraintVertical_bias="0.207"
+        tools:listitem="@layout/mars_item"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

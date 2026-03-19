@@ -164,22 +164,35 @@ FLUJO
                         datos o archivos de configuración.
 
 
-        Nota: Es probable que tu entidad de Room sea casi igual a MarsRealState.
+        C)  Respositorio (Room): Cerebri logístico donde se sincronizan los  datos;
+            se descargan de internet, se gaurdan en la base de datos local, se
+            muestran esos datos para que el resto de la app los use
 
-        C)  Respositorio (Room)
+            Nota: Es probable la entidad de Room sea casi igual a MarsRealState.
+
+            -> Implementar MarsRepository (room); ViewModel le solicita datos, si los posee en la DB
+            Local se los envía, de lo contrario, se los solicita a la api, los almacena en DB local,
+            y procede a pasarlos al viewModel
+
+                ->  Patrón Offline-First: Esto garantiza que tu app funcione aunque el usuario no
+                    tenga internet en ese momento.
+
+4) DESARROLLO VIEW MODEL
+
+    Con la capa model terminada (repositorio, datoslocal y datosremotos), sigue el ViewModel, cuya
+    función es de actuar como puente (intermediario) entre el modelo y la vista
+
+    -> MarsViewModel
+        i)      Recibir el MarsRepository en su constructor (es decir la lógica de la app)
+        ii)     Llamar método fetchDatafromInternetCoroutines() dentro de un viewModelScope (ciclo de vida
+                del view model, evitando fugas de memoria, cerrando corrutinas cuando el viewmodel es destruido)
+        iii)    Expone al fragment/activity el listAllTask para que lo observe.
 
 
-        Tu MarsRepository es el corazón de la lógica de negocio de la aplicación. Has implementado
-        con éxito la sincronización de datos: los descargas de internet, los guardas en la base de
-        datos local y expones esos datos para que el resto de la app los use.
 
+5) DESARROLLO VIEW
+    1) AdapterMars ->
 
-        4. Implementar el Repositorio (MarsRepository)
-        Este es el archivo que tienes seleccionado en la captura y es el cerebro logístico de tu app.
-
-        Función: El repositorio debe decidir: "¿Tengo datos en la DB local? Si no, los pido a la API, los guardo en la DB y luego se los paso al ViewModel".
-
-        Patrón Offline-First: Esto garantiza que tu app funcione aunque el usuario no tenga internet en ese momento.
 
 
 

@@ -3,8 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--
+    Android, por seguridad (a partir de la versión 9), bloquea por defecto
+    todo el tráfico que no sea cifrado (https). Glide intenta descargar la
+    foto, el sistema se lo impide y por eso ves el error "Failed to load resource".
 
+    Para arreglar esto sin cambiar las URLs, hay que darle permiso explícito a la app
+    para usar tráfico no seguro con la siguiente línea dentro de <application>:
+
+        android:usesCleartextTraffic="true"
+    -->
     <application
+        android:usesCleartextTraffic="true"
+
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
