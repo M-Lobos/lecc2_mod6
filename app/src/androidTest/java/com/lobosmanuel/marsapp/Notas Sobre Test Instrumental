@@ -1,0 +1,24 @@
+Explicación: ¿Por qué es especial este test?
+En Memoria (inMemoryDatabaseBuilder): Es la mejor práctica para testing. No escribe un archivo .db en el disco del teléfono, sino que crea la tabla en la RAM. Cuando el proceso termina (o ejecutas db.close()), todo desaparece. Esto evita que los datos del Test A ensucien los resultados del Test B.
+
+@RunWith(AndroidJUnit4::class): Esta anotación le dice a Android Studio: "Oye, no intentes correr esto en mi PC; mándalo al emulador porque necesito el motor de base de datos de Android".
+
+runBlocking: Como tus funciones de DAO probablemente son suspend, necesitas este puente para que el test no pase a la siguiente línea antes de que la base de datos termine de escribir el dato.
+
+El desafío del LiveData: Veo que usas .value sobre un LiveData. En los tests, los LiveData a veces son "perezosos". Si el test te falla con un valor nulo, recuerda que tienes la dependencia core-testing (la que pusiste en tu Gradle) para usar una regla llamada InstantTaskExecutorRule, que obliga a LiveData a responder instantáneamente en los tests.
+
+
+
+Problemas
+
+El hecho de que siga fallando incluso con el observeForever confirma que el problema es la asincronía. Aunque "despiertes" al LiveData, la consulta a la base de datos de Room no es instantánea; ocurre en un hilo secundario y el test (que va mucho más rápido) llega al assertEquals antes de que Room haya terminado de llenar la lista.
+
+Para solucionar esto de forma definitiva en Android, necesitas la Regla de Ejecución Instantánea. Sin ella, LiveData siempre llegará tarde al test.
+
+La Solución Definitiva (InstantTaskExecutorRule)
+Debes agregar una "Regla" que obligue a Android a ejecutar todas las tareas de arquitectura (como LiveData y Room) de forma secuencial e instantánea en el mismo hilo del test.
+
+¿Por qué esto sí funcionará?
+Por defecto, LiveData usa el MainLooper de Android para notificar cambios. En un test, ese "bucle de mensajes" no funciona igual que en una app real. La InstantTaskExecutorRule reemplaza ese bucle por uno que ejecuta todo inmediatamente.
+
+¿Te gustaría que probáramos a crear un test que inserte dos terrenos con el mismo ID para ver si tu base de datos los ignora o los reemplaza (OnConflictStrategy)? Sería una prueba de seguridad muy importante.
